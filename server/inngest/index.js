@@ -9,7 +9,11 @@ const syncUserCreation = inngest.createFunction(
   { id: "sync-user-from-clerk" },
   { event: "clerk/user.created" },
   async (event) => {
-    const { data } = event;
+    const data = event?.data;
+    if (!data?.id) {
+      console.error("Invalid event payload", event);
+    }
+    // const { data } = event;
     await prisma.user.create({
       data: {
         id: data.id,
@@ -26,7 +30,7 @@ const syncUserDeletion = inngest.createFunction(
   { id: "delete-user-with-clerk" },
   { event: "clerk/user.deleted" },
   async (event) => {
-    const { data } = event;
+    const { data } = event?.data;
     await prisma.user.delete({
       where: {
         id: data?.id,
@@ -41,7 +45,7 @@ const syncUserUpdation = inngest.createFunction(
   { id: "update-user-from-clerk" },
   { event: "clerk/user.updated" },
   async (event) => {
-    const { data } = event;
+    const { data } = event?.data;
     await prisma.user.update({
       where: {
         id: data.id,
