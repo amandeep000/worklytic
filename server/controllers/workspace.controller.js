@@ -33,7 +33,6 @@ export const getUserWorkspaces = async (req, res) => {
 };
 
 // Add member to the workspace
-
 export const addMember = async (req, res) => {
   try {
     const { userId } = await req.auth();
@@ -81,7 +80,7 @@ export const addMember = async (req, res) => {
 
     // check if user is already a member
     const existingmember = workspace.members.find(
-      (member) => member.userId === userId
+      (member) => member.userId === user.id
     );
     if (existingmember) {
       return res.status(400).json({ message: "User is already a member" });

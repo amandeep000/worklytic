@@ -5,23 +5,51 @@ import { Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loadTheme } from "../features/themeSlice";
 import { Loader2Icon } from "lucide-react";
-import { useUser, SignIn } from "@clerk/clerk-react";
+import {
+  useUser,
+  SignIn,
+  useAuth,
+  CreateOrganization,
+  useOrganizationList,
+} from "@clerk/clerk-react";
+import { fetchWorkspaces } from "../features/workspaceSlice";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loading } = useSelector((state) => state.workspace);
+  const { loading, workspaces } = useSelector((state) => state.workspace);
   const dispatch = useDispatch();
   const { user, isLoaded } = useUser();
+  const { getToken } = useAuth();
+  const { organizationList = [], isLoaded: orgLoaded } = useOrganizationList();
 
   // Initial load of theme
   useEffect(() => {
     dispatch(loadTheme());
   }, []);
 
+  // Initial load of workspaces
+  useEffect(() => {
+    if (isLoaded && orgLoaded && organizationList.length > 0) {
+      dispatch(fetchWorkspaces({ getToken }));
+    }
+  }, [user, isLoaded]);
+
+  console.log("isLoaded:", isLoaded);
+  console.log("orgLoaded:", orgLoaded);
+  console.log("organizationList:", organizationList);
+
   if (!user) {
     return (
       <div className="flex justify-center items-center h-screen bg-white dark:bg-zinc-950">
         <SignIn />
+      </div>
+    );
+  }
+
+  if (orgLoaded && organizationList.length === 0) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <CreateOrganization />
       </div>
     );
   }
