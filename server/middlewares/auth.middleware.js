@@ -5,8 +5,6 @@ export const protect = async (req, res, next) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    req.user = { id: userId };
     return next();
   } catch (error) {
     console.error("Auth middleware error:", error);

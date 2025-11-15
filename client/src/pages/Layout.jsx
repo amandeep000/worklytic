@@ -10,17 +10,17 @@ import {
   SignIn,
   useAuth,
   CreateOrganization,
-  useOrganizationList,
 } from "@clerk/clerk-react";
 import { fetchWorkspaces } from "../features/workspaceSlice";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loading, workspaces } = useSelector((state) => state.workspace);
+  const { loading, workspaces, loadOnce } = useSelector(
+    (state) => state.workspace
+  );
   const dispatch = useDispatch();
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
-  const { organizationList = [], isLoaded: orgLoaded } = useOrganizationList();
 
   // Initial load of theme
   useEffect(() => {
@@ -29,14 +29,18 @@ const Layout = () => {
 
   // Initial load of workspaces
   useEffect(() => {
-    if (isLoaded && orgLoaded && organizationList.length > 0) {
+    if (isLoaded && user) {
       dispatch(fetchWorkspaces({ getToken }));
     }
   }, [user, isLoaded]);
 
-  console.log("isLoaded:", isLoaded);
-  console.log("orgLoaded:", orgLoaded);
-  console.log("organizationList:", organizationList);
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
+        <Loader2Icon className="size-7 animate-spin" />
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -46,20 +50,23 @@ const Layout = () => {
     );
   }
 
-  if (orgLoaded && organizationList.length === 0) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <CreateOrganization />
-      </div>
-    );
-  }
-
-  if (loading)
+  //  Workspace fetch in progress
+  if (loading && !loadOnce) {
+    // only show loader during FIRST fetch
     return (
       <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
         <Loader2Icon className="size-7 text-blue-500 animate-spin" />
       </div>
     );
+  }
+  // //First fetch DONE, workspaces truly empty → show org onboarding
+  // if (loadOnce && workspaces.length === 0) {
+  //   return (
+  //     <div className="min-h-screen flex justify-center items-center">
+  //       <CreateOrganization />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex bg-white dark:bg-zinc-950 text-gray-900 dark:text-slate-100">

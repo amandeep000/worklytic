@@ -10,6 +10,7 @@ export const fetchWorkspaces = createAsyncThunk(
           Authorization: `Bearer ${await getToken()}`,
         },
       });
+      console.log(`getToken: ${await getToken()}`);
       return data.workspaces || [];
     } catch (error) {
       console.log(error?.response?.data?.message || error.message);
@@ -22,6 +23,7 @@ const initialState = {
   workspaces: [],
   currentWorkspace: null,
   loading: false,
+  loadOnce: false,
 };
 
 const workspaceSlice = createSlice({
@@ -157,6 +159,8 @@ const workspaceSlice = createSlice({
     });
     builder.addCase(fetchWorkspaces.fulfilled, (state, action) => {
       state.workspaces = action.payload;
+      console.log("fetched workspaces", action.payload);
+      console.log("Is empty", action.payload.length === 0);
       if (action.payload.length > 0) {
         const localStorageCurrentWorkspaceId =
           localStorage.getItem("currentWorkspaceId");
@@ -172,6 +176,7 @@ const workspaceSlice = createSlice({
         state.currentWorkspace = action.payload[0];
       }
       state.loading = false;
+      state.loadOnce = true;
     });
     builder.addCase(fetchWorkspaces.rejected, (state) => {
       state.loading = false;
