@@ -60,13 +60,13 @@ const Layout = () => {
     );
   }
   // //First fetch DONE, workspaces truly empty → show org onboarding
-  // if (loadOnce && workspaces.length === 0) {
-  //   return (
-  //     <div className="min-h-screen flex justify-center items-center">
-  //       <CreateOrganization />
-  //     </div>
-  //   );
-  // }
+  if (loadOnce && workspaces.length === 0) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <CreateOrganization />
+      </div>
+    );
+  }
 
   return (
     <div className="flex bg-white dark:bg-zinc-950 text-gray-900 dark:text-slate-100">
