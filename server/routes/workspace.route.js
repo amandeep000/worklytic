@@ -1,13 +1,12 @@
-import { Router } from "express";
+import express from "express";
 import {
   addMember,
   getUserWorkspaces,
 } from "../controllers/workspace.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
 
-const workspaceRouter = Router();
+const workspaceRouter = express.Router();
 
-workspaceRouter.route("/").get(protect, getUserWorkspaces);
-workspaceRouter.route("/add-member").post(protect, addMember);
+workspaceRouter.route("/").get(getUserWorkspaces);
+workspaceRouter.route("/add-member").post(addMember);
 
 export default workspaceRouter;
