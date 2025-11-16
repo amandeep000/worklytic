@@ -1,5 +1,6 @@
 import { Inngest } from "inngest";
 import prisma from "../configs/prisma.js";
+import sendEmail from "../configs/nodemailer.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "worklytic" });
@@ -141,6 +142,56 @@ const syncWorkspaceMemberCreation = inngest.createFunction(
   }
 );
 
+// Inngest function to send email on task creation
+const sendTaskAssignmentEmail = inngest.createFunction(
+  {
+    id: "send-task-assignment-mail",
+  },
+  { event: "app/task.assigned" },
+  async ({ event, step }) => {
+    const { taskId, origin } = event.data;
+
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { assignee: true, project: true },
+    });
+
+    await sendEmail({
+      to: task.assignee.email,
+      subject: `New Task assignment in ${task.project.name}`,
+      body: `Hi ${task.assignee.name}``${task.title} ``${new Date(
+        task.due_date
+      ).toLocaleDateString()} 
+   <a href=${origin}>View Task</a>`,
+    });
+    if (
+      new Date(task.due_date).toLocaleString() !== new Date().toDateString()
+    ) {
+      await step.sleepUntil("wait-for-the-due-date", new Date(task.due_date));
+      await step.run("check-if-task-is-completed", async () => {
+        const task = await prisma.task.findUnique({
+          where: { id: taskId },
+          include: { assignee: true, project: true },
+        });
+        if (!task) return;
+        if (task.status !== "DONE") {
+          await step.run("send-task-reminder-mail", async () => {
+            await sendEmail({
+              to: task.assignee.email,
+              subject: `reminder for ${task.project.name}`,
+              body: `Hi ${task.assignee.name}, You have a task due in ${
+                task.project.name
+              }: ${task.title}.Description: ${
+                task.description
+              }. Due Date: ${new Date(task.due_date).toLocaleDateString()}`,
+            });
+          });
+        }
+      });
+    }
+  }
+);
+
 // Create an empty array where we'll export future Inngest functions
 export const functions = [
   syncUserCreation,
@@ -150,4 +201,5 @@ export const functions = [
   syncWorkspaceUpdation,
   syncWorkspaceDeletion,
   syncWorkspaceMemberCreation,
+  sendTaskAssignmentEmail,
 ];
