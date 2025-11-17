@@ -11,13 +11,11 @@ import {
   useAuth,
   CreateOrganization,
 } from "@clerk/clerk-react";
-import { fetchWorkspaces } from "../features/workspaceSlice";
+import { fetchWorkspaces } from "../features/workspaceSlice.js";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loading, workspaces, loadOnce } = useSelector(
-    (state) => state.workspace
-  );
+  const { loading, workspaces } = useSelector((state) => state.workspace);
   const dispatch = useDispatch();
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
@@ -29,18 +27,16 @@ const Layout = () => {
 
   // Initial load of workspaces
   useEffect(() => {
-    if (isLoaded && user) {
+    if (isLoaded && user && workspaces.length === 0) {
       dispatch(fetchWorkspaces({ getToken }));
     }
   }, [user, isLoaded]);
 
-  if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
-        <Loader2Icon className="size-7 animate-spin" />
-      </div>
-    );
-  }
+  // useEffect(() => {
+  //   if (isLoaded && user) {
+  //     dispatch(fetchWorkspaces({ getToken }));
+  //   }
+  // }, [user, isLoaded]);
 
   if (!user) {
     return (
@@ -50,23 +46,39 @@ const Layout = () => {
     );
   }
 
-  //  Workspace fetch in progress
-  if (loading && !loadOnce) {
-    // only show loader during FIRST fetch
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
-        <Loader2Icon className="size-7 text-blue-500 animate-spin" />
+        <Loader2Icon className="size-7 animate-spin" />
       </div>
     );
   }
-  // //First fetch DONE, workspaces truly empty → show org onboarding
-  if (loadOnce && workspaces.length === 0) {
+
+  if (user && workspaces.length === 0) {
     return (
       <div className="min-h-screen flex justify-center items-center">
         <CreateOrganization />
       </div>
     );
   }
+
+  //  Workspace fetch in progress
+  // if (loading && !loadOnce) {
+  //   // only show loader during FIRST fetch
+  //   return (
+  //     <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
+  //       <Loader2Icon className="size-7 text-blue-500 animate-spin" />
+  //     </div>
+  //   );
+  // }
+  // //First fetch DONE, workspaces truly empty
+  // if (loadOnce && workspaces.length === 0) {
+  //   return (
+  //     <div className="min-h-screen flex justify-center items-center">
+  //       <CreateOrganization />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex bg-white dark:bg-zinc-950 text-gray-900 dark:text-slate-100">

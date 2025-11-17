@@ -10,10 +10,12 @@ export const fetchWorkspaces = createAsyncThunk(
           Authorization: `Bearer ${await getToken()}`,
         },
       });
+      const token = await getToken();
+      console.log("TOKEN:", token);
+
       return data.workspaces || [];
     } catch (error) {
-      console.log(error?.response?.data?.message || error.message);
-      return [];
+      throw new Error(error?.response?.data?.message || error.message);
     }
   }
 );
@@ -22,7 +24,7 @@ const initialState = {
   workspaces: [],
   currentWorkspace: null,
   loading: false,
-  loadOnce: false,
+  // loadOnce: false,
 };
 
 const workspaceSlice = createSlice({
@@ -58,7 +60,7 @@ const workspaceSlice = createSlice({
     },
     deleteWorkspace: (state, action) => {
       state.workspaces = state.workspaces.filter(
-        (w) => w._id !== action.payload
+        (w) => w.id !== action.payload
       );
     },
     addProject: (state, action) => {
@@ -179,6 +181,7 @@ const workspaceSlice = createSlice({
     });
     builder.addCase(fetchWorkspaces.rejected, (state) => {
       state.loading = false;
+      state.loadOnce = true;
     });
   },
 });

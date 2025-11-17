@@ -1,4 +1,3 @@
-import { err } from "inngest/types";
 import prisma from "../configs/prisma.js";
 
 // Get all workspaces for user

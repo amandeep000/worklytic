@@ -23,7 +23,7 @@ app.get("/", (req, res) => res.send("server is live"));
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 // Routes
-app.use("/api/workspaces", protect, workspaceRouter);
+app.use("/api/workspaces", workspaceRouter);
 app.use("/api/projects", protect, projectRouter);
 app.use("/api/tasks", protect, taskRouter);
 app.use("/api/comments", protect, commentRouter);
