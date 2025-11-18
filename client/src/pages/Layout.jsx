@@ -32,12 +32,6 @@ const Layout = () => {
     }
   }, [user, isLoaded]);
 
-  // useEffect(() => {
-  //   if (isLoaded && user) {
-  //     dispatch(fetchWorkspaces({ getToken }));
-  //   }
-  // }, [user, isLoaded]);
-
   if (!user) {
     return (
       <div className="flex justify-center items-center h-screen bg-white dark:bg-zinc-950">
@@ -61,24 +55,6 @@ const Layout = () => {
       </div>
     );
   }
-
-  //  Workspace fetch in progress
-  // if (loading && !loadOnce) {
-  //   // only show loader during FIRST fetch
-  //   return (
-  //     <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
-  //       <Loader2Icon className="size-7 text-blue-500 animate-spin" />
-  //     </div>
-  //   );
-  // }
-  // //First fetch DONE, workspaces truly empty
-  // if (loadOnce && workspaces.length === 0) {
-  //   return (
-  //     <div className="min-h-screen flex justify-center items-center">
-  //       <CreateOrganization />
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="flex bg-white dark:bg-zinc-950 text-gray-900 dark:text-slate-100">

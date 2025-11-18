@@ -252,6 +252,7 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
               Cancel
             </button>
             <button
+              type="submit"
               disabled={isSubmitting || !currentWorkspace}
               className="px-4 py-2 rounded bg-gradient-to-br from-blue-500 to-blue-600 text-white dark:text-zinc-200"
             >
