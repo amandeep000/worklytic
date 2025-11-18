@@ -1,4 +1,3 @@
-import { err } from "inngest/types";
 import prisma from "../configs/prisma.js";
 import sendEmail from "../configs/nodemailer.js";
 import { inngest } from "../inngest/index.js";

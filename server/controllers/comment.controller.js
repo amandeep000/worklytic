@@ -40,6 +40,7 @@ export const addComment = async (req, res) => {
 export const getTaskcomments = async (req, res) => {
   try {
     const { taskId } = req.params;
+
     const comments = await prisma.comment.findMany({
       where: { taskId },
       include: { user: true },
