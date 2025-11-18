@@ -10,8 +10,6 @@ export const fetchWorkspaces = createAsyncThunk(
           Authorization: `Bearer ${await getToken()}`,
         },
       });
-      const token = await getToken();
-      console.log("TOKEN:", token);
 
       return data.workspaces || [];
     } catch (error) {
@@ -160,8 +158,7 @@ const workspaceSlice = createSlice({
     });
     builder.addCase(fetchWorkspaces.fulfilled, (state, action) => {
       state.workspaces = action.payload;
-      console.log("fetched workspaces", action.payload);
-      console.log("Is empty", action.payload.length === 0);
+
       if (action.payload.length > 0) {
         const localStorageCurrentWorkspaceId =
           localStorage.getItem("currentWorkspaceId");
