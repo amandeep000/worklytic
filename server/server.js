@@ -10,6 +10,7 @@ import projectRouter from "./routes/project.route.js";
 import taskRouter from "./routes/task.route.js";
 import commentRouter from "./routes/comment.route.js";
 import { rateLimit } from "express-rate-limit";
+import helmet from "helmet";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +33,7 @@ app.get("/", (req, res) => res.send("server is live"));
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use(limiter);
+app.use(helmet());
 
 // Routes
 app.use("/api/workspaces", workspaceRouter);
